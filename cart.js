@@ -52,8 +52,10 @@ function updateCartDisplay() {
 
     const tr = document.createElement("tr");
 
+    // Add product image from product_img folder
+    const productImage = `product_img/${productId}.jpg`; // เส้นทางของรูป
     const productNameCell = document.createElement("td");
-    productNameCell.textContent = `${productId}`;
+    productNameCell.innerHTML = `<img src="${productImage}" alt="${productId}" style="width: 50px; height: 50px;"> ${productId}`;
     tr.appendChild(productNameCell);
 
     const quantityCell = document.createElement("td");
@@ -84,7 +86,6 @@ function updateCartDisplay() {
   }
 
   table.appendChild(tbody);
-
   cartElement.appendChild(table);
 
   if (Object.keys(cart).length === 0) {
@@ -101,7 +102,7 @@ document.getElementById("printCart").addEventListener("click", () => {
   printReceipt("Thank you!", generateCartReceipt());
 });
 
-/**ฟังก์ชันนี้ใช้สำหรับพิมพ์บิลใบเสร็จของสินค้า จะเปิดหน้าต่างใหม่และพิมพ์บิลใบเสร็จของสินค้า.*/
+/**ฟังก์ชันนี้ใช้สำหรับพิมพ์บิลใบเสร็จของสินค้า จะเปิดหน้าต่างใหม่และพิมพ์บิลใบเสร็จของสินค้า. */
 function printReceipt(title, content) {
   const printWindow = window.open("1", "_blank");
   printWindow.document.write(
@@ -111,85 +112,54 @@ function printReceipt(title, content) {
   printWindow.print();
 }
 
-/** ฟังก์ชันนี้ใช้สำหรับสร้างเนื้อหาในใบเสร็จของ Cart.*/
+/** ฟังก์ชันนี้ใช้สำหรับสร้างเนื้อหาในใบเสร็จของ Cart. */
 function generateCartReceipt() {
-  let receiptContent = "<h2>Cart Receipt</h2>";
-
-  for (const productId in cart) {
-    const item = cart[productId];
-    const itemTotalPrice = item.quantity * item.price;
-
-    receiptContent += `<p>Product ${productId}: ${item.quantity} x $${item.price} = $${itemTotalPrice}</p>`;
-  }
-
-  const totalPrice = Object.keys(cart).length > 0 ? calculateTotalPrice() : 0;
-  receiptContent += `<p>Total Price: $${totalPrice}</p>`;
-
-  return receiptContent;
-}
-
-/**
- * สร้างบิลใบเสร็จของสินค้า และปริ้นออกเป็น PDF
- */
-function generateProductReceipts() {
-  let receiptContent = "<h2>Product Receipts</h2>";
-
-  document.querySelectorAll(".product").forEach((product, index) => {
-    const productName = product.querySelector("h5").textContent;
-    const productPrice = parseFloat(
-      product.querySelector(".add-to-cart").getAttribute("data-price")
-    );
-
-    receiptContent += `<p>${productName} - $${productPrice}</p>`;
-  });
-
-  return receiptContent;
-}
-
-/** ฟังก์ชันนี้ใช้สำหรับคำนวณราคารวมของสินค้า Cart ตอน Print Cart Reciept*/
-function generateCartReceipt() {
-  let receiptContent = `
-      <style>
-        @page {
-          size: 100mm 100mm;
-        }
-        body {
-          width: 100mm;
-          height: 100mm;
-          margin: 0;
-          padding: 1px;
-          font-family: Arial, sans-serif;
-        }
-        h2 {
-          text-align: center;
-          margin-bottom: 10px;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 10px;
-        }
-        th, td {
-          border: 1px solid #ddd;
-          padding: 5px;
-          text-align: left;
-        }
-        th {
-          background-color: #f2f2f2;
-        }
-      </style>
-      <p>SANGKONG SHOP!</p>
-      <h2>Cart Receipt</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>`;
+  let receiptContent = ` 
+    <style>
+      @page {
+        size: 100mm 100mm;
+      }
+      body {
+        width: 100mm;
+        height: 100mm;
+        margin: 0;
+        padding: 1px;
+        font-family: Arial, sans-serif;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 5px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .qr-code {
+        text-align: center;
+        margin-top: 10px;
+      }
+    </style>
+    <p>SANGKONG SHOP!</p>
+    <h2>Cart Receipt</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>`;
 
   let totalPrice = 0;
 
@@ -201,8 +171,8 @@ function generateCartReceipt() {
         <tr>
           <td>${productId}</td>
           <td>${item.quantity}</td>
-          <td>${item.price}บาท</td>
-          <td>${itemTotalPrice}บาท</td>
+          <td>${item.price} บาท</td>
+          <td>${itemTotalPrice} บาท</td>
         </tr>`;
 
     totalPrice += itemTotalPrice;
@@ -211,11 +181,15 @@ function generateCartReceipt() {
   receiptContent += `
         </tbody>
       </table>
-      <p>Total Price:${totalPrice} บาท</p>
-      <p>คุณ Kays Tel.082 082 8520</p>
-      `;
+      <p>Total Price: ${totalPrice} บาท</p>
+      <p>คุณ Kays Tel. 082 082 8520</p>
+      
+      <!-- QR Code สำหรับสั่งซื้อผ่าน LINE -->
+      <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center;">
+          <p>สั่งซื้อผ่าน LINE:</p>
+         <img src="product_img/qr-code.png" alt="QR Code to Order on LINE" style="width: 350px; height: 350px;">
+      </div>
+    `;
 
   return receiptContent;
 }
-
-// ++++++++++++++++++++++++++++
